@@ -1,0 +1,7 @@
+﻿services:
+  sandboxpay.api:
+    image: sandboxpay.api
+    build:
+      context: .
+      dockerfile: SandboxPay.Api/Dockerfile
+
