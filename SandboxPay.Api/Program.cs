@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SandboxPay.Api.Modules.MockPos.Application;
+using SandboxPay.Api.Modules.MockPos.Infrastructure;
 using SandboxPay.Api.Modules.MockPos.Support;
-using SandboxPay.Api.Modules.MockPos.Web;
+using SandboxPay.Api.Modules.MockPos.Web.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAuthorizePaymentService, AuthorizePaymentService>();
+builder.Services.AddScoped<ICapturePaymentService, CapturePaymentService>();
+builder.Services.AddScoped<IVoidPaymentService, VoidPaymentService>();
+builder.Services.AddScoped<IRefundPaymentService, RefundPaymentService>();
+builder.Services.AddSingleton<IPosAuthorizationStore, InMemoryPosAuthorizationStore>();
 builder.Services.AddSingleton<IPosIdGenerator, PosIdGenerator>();
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

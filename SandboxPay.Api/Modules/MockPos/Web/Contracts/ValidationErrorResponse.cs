@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace SandboxPay.Api.Modules.MockPos.Web;
+namespace SandboxPay.Api.Modules.MockPos.Web.Contracts;
 
 public sealed record ValidationErrorResponse(
     string Status,

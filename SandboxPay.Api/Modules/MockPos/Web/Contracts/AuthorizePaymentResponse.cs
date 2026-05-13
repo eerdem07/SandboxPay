@@ -1,6 +1,6 @@
 using SandboxPay.Api.Modules.MockPos.Application;
 
-namespace SandboxPay.Api.Modules.MockPos.Web;
+namespace SandboxPay.Api.Modules.MockPos.Web.Contracts;
 
 public sealed record AuthorizePaymentResponse(
     string Status,

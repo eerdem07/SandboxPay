@@ -7,7 +7,13 @@ public interface IPosIdGenerator
 {
     string GeneratePosTransactionId();
 
+    string GeneratePosCaptureId();
+
+    string GeneratePosVoidId();
+
     string GenerateAuthCode();
+
+    string GeneratePosRefundId();
 
     string GenerateHostReferenceNumber(DateTimeOffset timestamp);
 }
@@ -21,9 +27,24 @@ public sealed class PosIdGenerator : IPosIdGenerator
         return $"pos_txn_{Convert.ToHexString(RandomNumberGenerator.GetBytes(5)).ToLowerInvariant()}";
     }
 
+    public string GeneratePosCaptureId()
+    {
+        return $"pos_cap_{Convert.ToHexString(RandomNumberGenerator.GetBytes(5)).ToLowerInvariant()}";
+    }
+
+    public string GeneratePosVoidId()
+    {
+        return $"pos_void_{Convert.ToHexString(RandomNumberGenerator.GetBytes(5)).ToLowerInvariant()}";
+    }
+
     public string GenerateAuthCode()
     {
         return $"A{RandomNumberGenerator.GetInt32(100000).ToString("D5", CultureInfo.InvariantCulture)}";
+    }
+
+    public string GeneratePosRefundId()
+    {
+        return $"pos_ref_{Convert.ToHexString(RandomNumberGenerator.GetBytes(5)).ToLowerInvariant()}";
     }
 
     public string GenerateHostReferenceNumber(DateTimeOffset timestamp)

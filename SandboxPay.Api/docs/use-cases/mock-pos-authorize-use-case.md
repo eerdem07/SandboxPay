@@ -2,7 +2,8 @@
 
 Status: Draft  
 Module: mock-pos  
-Related API contract: `mock-pos-authorize-api-contract.md`
+Related API contract: `mock-pos-authorize-api-contract.md`  
+Related capture use case: `mock-pos-capture-use-case.md`
 
 ---
 
@@ -16,7 +17,6 @@ Bu use case gerçek banka POS entegrasyonunu simüle eder.
 
 - 3D Secure yok
 - Refund yok
-- Capture endpoint’i yok
 - Void yok
 - Settlement yok
 - Payout yok
@@ -28,6 +28,12 @@ Tek sorumluluk:
 Gateway -> Mock POS authorize request
 Mock POS -> deterministic authorize response
 ```
+
+Manual capture flow için başarılı authorization-only işlemde non-sensitive metadata in-memory store’a yazılır.
+
+`capture=true` sale flow’dur. Auth ve capture tek POS işleminde tamamlanır.
+
+`capture=false` authorization-only/manual capture flow’dur. Başarılı response sonrasında `mock-pos-capture-use-case.md` devreye girer.
 
 ---
 
@@ -131,7 +137,9 @@ status = AUTHORIZED
 transactionType = AUTHORIZATION_ONLY
 ```
 
-11. Mock POS response üretir.
+11. Başarılı authorization-only işlem in-memory store’a capturable metadata olarak kaydedilir.
+
+12. Mock POS response üretir.
 
 ---
 
@@ -212,6 +220,14 @@ approved = true
 responseCode = 00
 ```
 
+Gateway tarafı:
+
+```text
+PaymentAttempt -> SUCCEEDED
+PaymentIntent -> SUCCEEDED
+Capture kaydı oluşturulmaz
+```
+
 Başarılı authorization-only işleminde:
 
 ```text
@@ -219,6 +235,14 @@ status = AUTHORIZED
 transactionType = AUTHORIZATION_ONLY
 approved = true
 responseCode = 00
+```
+
+Gateway tarafı:
+
+```text
+PaymentAttempt -> AUTHORIZED
+PaymentIntent -> REQUIRES_CAPTURE
+authorizationExpiresAt set edilir
 ```
 
 Declined işlemde:
@@ -288,7 +312,55 @@ capture=false -> status=AUTHORIZED
 
 ---
 
-### BR-005: Do not store card data
+### BR-005: Automatic capture does not create Capture entity
+
+`capture=true` sale flow’dur.
+
+Gateway tarafında:
+
+```text
+PaymentAttempt -> SUCCEEDED
+PaymentIntent -> SUCCEEDED
+Capture kaydı oluşturulmaz
+```
+
+Reason:
+
+```text
+Capture domain’i sonradan yapılan capture operasyonunu temsil eder.
+Sale transaction zaten PaymentAttempt üzerinde tamamlanır.
+```
+
+---
+
+### BR-006: Authorization-only creates capturable metadata
+
+`capture=false` ve `responseCode=00` olduğunda Mock POS in-memory store’a capture için gerekli metadata’yı kaydedebilir.
+
+Bu metadata sadece `/api/v1/pos/capture` doğrulaması içindir.
+
+Kaydedilecek alanlar:
+
+- `merchantId`
+- `terminalId`
+- `orderId`
+- `transactionId`
+- `posTransactionId`
+- `authCode`
+- `hostReferenceNumber`
+- `amount`
+- `currency`
+- `authorizedAt`
+- `authorizationExpiresAt`
+- `captured`
+
+Card data saklanmaz.
+
+`authorizationExpiresAt` POS response içinde dönmez. Gateway kendi state’inde expiry set eder; Mock POS internal capture eligibility için aynı metadata üzerinde expiry tutabilir.
+
+---
+
+### BR-007: Do not store card data
 
 Mock POS card data saklamamalıdır.
 
@@ -355,6 +427,8 @@ mockpos/
     AuthorizePaymentService
     AuthorizePaymentCommand
     AuthorizePaymentResult
+    AuthorizedPaymentStore
+    AuthorizedPaymentRecord
 
   domain/
     PosAuthorizeStatus
@@ -366,10 +440,13 @@ mockpos/
 
   web/
     PosAuthorizeController
-    AuthorizePaymentRequest
-    AuthorizePaymentResponse
-    CardRequest
-    ValidationErrorResponse
+
+    contracts/
+      AuthorizePaymentRequest
+      AuthorizePaymentResponse
+      CardRequest
+      ValidationError
+      ValidationErrorResponse
 
   support/
     PosIdGenerator
@@ -383,7 +460,8 @@ Bu use case için şimdilik yapılmayacaklar:
 
 - 3D Secure
 - `/3ds/complete`
-- Capture endpoint
+- Partial capture
+- Multiple capture
 - Void endpoint
 - Refund endpoint
 - Settlement

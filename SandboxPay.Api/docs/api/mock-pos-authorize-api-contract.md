@@ -2,7 +2,8 @@
 
 Status: Draft  
 Module: mock-pos  
-Related use case: `mock-pos-authorize-use-case.md`
+Related use case: `mock-pos-authorize-use-case.md`  
+Related capture contract: `mock-pos-capture-api-contract.md`
 
 ---
 
@@ -16,9 +17,13 @@ POST /api/v1/pos/authorize
 
 ## 2. Purpose
 
-Mira Gateway’in Mock BankPOS üzerinden ödeme authorization/capture denemesi başlatmasını sağlar.
+Mira Gateway’in Mock BankPOS üzerinden ödeme authorize veya sale denemesi başlatmasını sağlar.
 
 Bu endpoint test kartı numarasına göre deterministik response döner.
+
+`capture=true` sale flow’dur. Auth ve capture aynı işlemde tamamlanır.
+
+`capture=false` authorization-only/manual capture flow’dur. Başarılı response sonrasında `/api/v1/pos/capture` çağrılabilir.
 
 ---
 
@@ -126,6 +131,21 @@ Response:
 }
 ```
 
+Gateway side expected state:
+
+```text
+PaymentAttempt -> SUCCEEDED
+PaymentIntent -> SUCCEEDED
+Capture kaydı oluşturulmaz
+```
+
+Reason:
+
+```text
+Capture domain’i sonradan yapılan capture operasyonunu temsil eder.
+Sale transaction zaten PaymentAttempt üzerinde tamamlanır.
+```
+
 ---
 
 ## 8. Response Body - Approved Authorization Only
@@ -156,6 +176,33 @@ Response:
   "authorizedAt": "2026-05-04T19:30:00Z"
 }
 ```
+
+This response is capturable through:
+
+```http
+POST /api/v1/pos/capture
+```
+
+Gateway side expected state:
+
+```text
+PaymentAttempt -> AUTHORIZED
+PaymentIntent -> REQUIRES_CAPTURE
+authorizationExpiresAt set edilir
+```
+
+Capture request should use these values from the authorization response:
+
+| Capture Field | Source |
+|---|---|
+| `originalTransactionId` | `transactionId` |
+| `originalPosTransactionId` | `posTransactionId` |
+| `authCode` | `authCode` |
+| `hostReferenceNumber` | `hostReferenceNumber` |
+| `amount` | `amount` |
+| `currency` | `currency` |
+
+`authorizationExpiresAt` is Gateway-owned state. It is not returned in this POS response.
 
 ---
 
@@ -389,11 +436,12 @@ If PAN must be logged, mask it:
 
 ## 18. Out of Scope
 
-Do not implement yet:
+Do not implement yet in this contract:
 
 - 3D Secure
 - `/api/v1/pos/3ds/complete`
-- Capture endpoint
+- Partial capture
+- Multiple capture
 - Void endpoint
 - Refund endpoint
 - Settlement

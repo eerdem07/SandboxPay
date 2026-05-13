@@ -1,5 +1,6 @@
 using System.Globalization;
 using SandboxPay.Api.Modules.MockPos.Application;
+using SandboxPay.Api.Modules.MockPos.Web.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SandboxPay.Api.Modules.MockPos.Web;
