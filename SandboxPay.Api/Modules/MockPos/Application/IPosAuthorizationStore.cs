@@ -4,7 +4,7 @@ public interface IPosAuthorizationStore
 {
     void Save(PosAuthorization authorization);
 
-    bool TryGet(string transactionId, out PosAuthorization authorization);
+    bool TryGet(string transactionId, out PosAuthorization? authorization);
 
     bool TryMarkCaptured(string transactionId, string posTransactionId, out PosAuthorization? authorization);
 

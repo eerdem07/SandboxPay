@@ -2,36 +2,37 @@ using SandboxPay.Api.Modules.MockPos.Application;
 
 namespace SandboxPay.Api.Modules.MockPos.Web.Contracts;
 
-public sealed record AuthorizePaymentResponse(
+public sealed record Complete3DsResponse(
     string Status,
     string TransactionType,
     bool Approved,
     string ResponseCode,
     string ResponseMessage,
     string TransactionId,
+    string? OriginalTransactionId,
     string? PosTransactionId,
     string? AuthCode,
     string? HostReferenceNumber,
-    string Amount,
-    string Currency,
-    int InstallmentCount,
+    string? Amount,
+    string? Currency,
+    int? InstallmentCount,
     string? InstallmentAmount,
-    string? AuthorizedAt,
-    string? ThreeDsSessionId,
-    string? AcsUrl,
-    string? ThreeDsFlow,
-    string? MessageVersion,
-    string? ExpiresAt)
+    string AuthorizedAt,
+    string ThreeDsSessionId,
+    string? ThreeDsStatus,
+    string? Eci,
+    string? MessageVersion)
 {
-    public static AuthorizePaymentResponse FromResult(AuthorizePaymentResult result)
+    public static Complete3DsResponse FromResult(Complete3DsResult result)
     {
-        return new AuthorizePaymentResponse(
+        return new Complete3DsResponse(
             result.Status.ToString(),
             result.TransactionType.ToString(),
             result.Approved,
             result.ResponseCode,
             result.ResponseMessage,
             result.TransactionId,
+            result.OriginalTransactionId,
             result.PosTransactionId,
             result.AuthCode,
             result.HostReferenceNumber,
@@ -41,9 +42,8 @@ public sealed record AuthorizePaymentResponse(
             result.InstallmentAmount,
             result.AuthorizedAt,
             result.ThreeDsSessionId,
-            result.AcsUrl,
-            result.ThreeDsFlow?.ToString(),
-            result.MessageVersion,
-            result.ExpiresAt);
+            result.ThreeDsStatus?.ToString(),
+            result.Eci,
+            result.MessageVersion);
     }
 }

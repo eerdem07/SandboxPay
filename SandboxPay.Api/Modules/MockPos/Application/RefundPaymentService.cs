@@ -17,7 +17,7 @@ public sealed class RefundPaymentService(
     {
         var refundedAt = DateTimeOffset.UtcNow;
 
-        if (!authorizationStore.TryGet(command.OriginalTransactionId, out var authorization))
+        if (!authorizationStore.TryGet(command.OriginalTransactionId, out var authorization) || authorization is null)
         {
             return Failure(command, PosResponseCode.InvalidTransaction, refundedAt);
         }
@@ -60,7 +60,7 @@ public sealed class RefundPaymentService(
             hostReferenceNumber,
             command.Amount,
             command.Currency,
-            FormatTimestamp(refundedAt));
+            PosConstants.FormatTimestamp(refundedAt));
     }
 
     private static RefundPaymentResult Failure(
@@ -114,10 +114,5 @@ public sealed class RefundPaymentService(
                 CultureInfo.InvariantCulture,
                 out var authorized)
             && requested == authorized;
-    }
-
-    private static string FormatTimestamp(DateTimeOffset timestamp)
-    {
-        return timestamp.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
     }
 }

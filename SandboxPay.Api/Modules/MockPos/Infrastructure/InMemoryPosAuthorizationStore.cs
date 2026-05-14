@@ -12,9 +12,9 @@ public sealed class InMemoryPosAuthorizationStore : IPosAuthorizationStore
         authorizations[authorization.TransactionId] = authorization;
     }
 
-    public bool TryGet(string transactionId, out PosAuthorization authorization)
+    public bool TryGet(string transactionId, out PosAuthorization? authorization)
     {
-        return authorizations.TryGetValue(transactionId, out authorization!);
+        return authorizations.TryGetValue(transactionId, out authorization);
     }
 
     public bool TryMarkCaptured(string transactionId, string posTransactionId, out PosAuthorization? authorization)

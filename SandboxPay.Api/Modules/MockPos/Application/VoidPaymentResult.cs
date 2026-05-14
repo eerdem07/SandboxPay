@@ -15,4 +15,4 @@ public sealed record VoidPaymentResult(
     string? HostReferenceNumber,
     string Amount,
     string Currency,
-    string VoidedAt);
+    string? VoidedAt);

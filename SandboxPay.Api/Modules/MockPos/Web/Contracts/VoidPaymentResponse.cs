@@ -15,7 +15,7 @@ public sealed record VoidPaymentResponse(
     string? HostReferenceNumber,
     string Amount,
     string Currency,
-    string VoidedAt)
+    string? VoidedAt)
 {
     public static VoidPaymentResponse FromResult(VoidPaymentResult result)
     {

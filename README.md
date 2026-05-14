@@ -198,6 +198,13 @@ REFUND (after SALE or CAPTURE):
 
 Unknown PANs: if Luhn-valid → `00` approved; if Luhn-invalid → `14` declined.
 
+### Installment Cards
+
+| PAN | Max Installment Count | Scenario |
+|---|---:|---|
+| `4000000000006000` | `0` | Installments restricted, single payment approved |
+| `4000000000006003` | `3` | Installments above 3 are restricted |
+
 ### 3DS Cards
 
 | PAN | Flow | Final Status |
@@ -223,16 +230,19 @@ API contracts and use cases are in `SandboxPay.Api/docs/`:
 
 | Doc | Path |
 |---|---|
-| Authorize API | `docs/api/mock-pos-authorize-api-contract.md` |
-| Capture API | `docs/api/mock-pos-capture-api-contract.md` |
-| Void API | `docs/api/mock-pos-void-api-contract.md` |
-| Refund API | `docs/api/mock-pos-refund-api-contract.md` |
-| 3DS API | `docs/api/mock-pos-3ds-api-contract.md` |
-| Authorize Use Case | `docs/use-cases/mock-pos-authorize-use-case.md` |
-| Capture Use Case | `docs/use-cases/mock-pos-capture-use-case.md` |
-| Void Use Case | `docs/use-cases/mock-pos-void-use-case.md` |
-| Refund Use Case | `docs/use-cases/mock-pos-refund-use-case.md` |
-| 3DS Use Case | `docs/use-cases/mock-pos-3ds-use-case.md` |
+| Payment Flows | [`SandboxPay.Api/docs/mock-pos-payment-flows.md`](SandboxPay.Api/docs/mock-pos-payment-flows.md) |
+| Authorize API | [`SandboxPay.Api/docs/api/mock-pos-authorize-api-contract.md`](SandboxPay.Api/docs/api/mock-pos-authorize-api-contract.md) |
+| Capture API | [`SandboxPay.Api/docs/api/mock-pos-capture-api-contract.md`](SandboxPay.Api/docs/api/mock-pos-capture-api-contract.md) |
+| Void API | [`SandboxPay.Api/docs/api/mock-pos-void-api-contract.md`](SandboxPay.Api/docs/api/mock-pos-void-api-contract.md) |
+| Refund API | [`SandboxPay.Api/docs/api/mock-pos-refund-api-contract.md`](SandboxPay.Api/docs/api/mock-pos-refund-api-contract.md) |
+| 3DS API | [`SandboxPay.Api/docs/api/mock-pos-3ds-api-contract.md`](SandboxPay.Api/docs/api/mock-pos-3ds-api-contract.md) |
+| Installment API | [`SandboxPay.Api/docs/api/mock-pos-installment-api-contract.md`](SandboxPay.Api/docs/api/mock-pos-installment-api-contract.md) |
+| Authorize Use Case | [`SandboxPay.Api/docs/use-cases/mock-pos-authorize-use-case.md`](SandboxPay.Api/docs/use-cases/mock-pos-authorize-use-case.md) |
+| Capture Use Case | [`SandboxPay.Api/docs/use-cases/mock-pos-capture-use-case.md`](SandboxPay.Api/docs/use-cases/mock-pos-capture-use-case.md) |
+| Void Use Case | [`SandboxPay.Api/docs/use-cases/mock-pos-void-use-case.md`](SandboxPay.Api/docs/use-cases/mock-pos-void-use-case.md) |
+| Refund Use Case | [`SandboxPay.Api/docs/use-cases/mock-pos-refund-use-case.md`](SandboxPay.Api/docs/use-cases/mock-pos-refund-use-case.md) |
+| 3DS Use Case | [`SandboxPay.Api/docs/use-cases/mock-pos-3ds-use-case.md`](SandboxPay.Api/docs/use-cases/mock-pos-3ds-use-case.md) |
+| Installment Use Case | [`SandboxPay.Api/docs/use-cases/mock-pos-installment-use-case.md`](SandboxPay.Api/docs/use-cases/mock-pos-installment-use-case.md) |
 
 ## Notes
 

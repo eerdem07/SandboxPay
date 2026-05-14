@@ -15,8 +15,11 @@ builder.Services.AddScoped<IAuthorizePaymentService, AuthorizePaymentService>();
 builder.Services.AddScoped<ICapturePaymentService, CapturePaymentService>();
 builder.Services.AddScoped<IVoidPaymentService, VoidPaymentService>();
 builder.Services.AddScoped<IRefundPaymentService, RefundPaymentService>();
+builder.Services.AddScoped<IComplete3DsService, Complete3DsService>();
 builder.Services.AddSingleton<IPosAuthorizationStore, InMemoryPosAuthorizationStore>();
+builder.Services.AddSingleton<IPos3DsSessionStore, InMemoryPos3DsSessionStore>();
 builder.Services.AddSingleton<IPosIdGenerator, PosIdGenerator>();
+builder.Services.Configure<MockPosOptions>(builder.Configuration.GetSection("MockPos"));
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>

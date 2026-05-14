@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using SandboxPay.Api.Modules.MockPos.Application;
 using SandboxPay.Api.Modules.MockPos.Web.Contracts;
@@ -50,35 +49,17 @@ public sealed class PosCaptureController(ICapturePaymentService capturePaymentSe
             return errors;
         }
 
-        AddRequired(errors, "merchantId", request.MerchantId);
-        AddRequired(errors, "terminalId", request.TerminalId);
-        AddRequired(errors, "orderId", request.OrderId);
-        AddRequired(errors, "transactionId", request.TransactionId);
-        AddRequired(errors, "originalTransactionId", request.OriginalTransactionId);
-        AddRequired(errors, "originalPosTransactionId", request.OriginalPosTransactionId);
-        AddRequired(errors, "authCode", request.AuthCode);
-        AddRequired(errors, "hostReferenceNumber", request.HostReferenceNumber);
-        AddAmountValidation(errors, request.Amount);
-        AddRequired(errors, "currency", request.Currency);
+        PosValidationHelpers.AddRequired(errors, "merchantId", request.MerchantId);
+        PosValidationHelpers.AddRequired(errors, "terminalId", request.TerminalId);
+        PosValidationHelpers.AddRequired(errors, "orderId", request.OrderId);
+        PosValidationHelpers.AddRequired(errors, "transactionId", request.TransactionId);
+        PosValidationHelpers.AddRequired(errors, "originalTransactionId", request.OriginalTransactionId);
+        PosValidationHelpers.AddRequired(errors, "originalPosTransactionId", request.OriginalPosTransactionId);
+        PosValidationHelpers.AddRequired(errors, "authCode", request.AuthCode);
+        PosValidationHelpers.AddRequired(errors, "hostReferenceNumber", request.HostReferenceNumber);
+        PosValidationHelpers.AddAmountValidation(errors, request.Amount);
+        PosValidationHelpers.AddRequired(errors, "currency", request.Currency);
 
         return errors;
-    }
-
-    private static void AddRequired(List<ValidationError> errors, string field, string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            errors.Add(new ValidationError(field, $"{field} must not be blank"));
-        }
-    }
-
-    private static void AddAmountValidation(List<ValidationError> errors, string? amount)
-    {
-        if (string.IsNullOrWhiteSpace(amount)
-            || !decimal.TryParse(amount.Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var parsedAmount)
-            || parsedAmount <= 0)
-        {
-            errors.Add(new ValidationError("amount", "amount must be greater than 0"));
-        }
     }
 }

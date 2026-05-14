@@ -15,4 +15,4 @@ public sealed record CapturePaymentResult(
     string? HostReferenceNumber,
     string Amount,
     string Currency,
-    string CapturedAt);
+    string? CapturedAt);

@@ -72,7 +72,7 @@ Bu endpoint test kartı numarasına göre deterministik response döner.
 | `transactionId` | string | Yes | Gateway PaymentAttempt id/reference |
 | `amount` | string decimal | Yes | Transaction amount |
 | `currency` | string | Yes | Currency code. Example: `TRY` |
-| `installmentCount` | integer | Yes | `1` means no installment |
+| `installmentCount` | integer | Yes | `1` means no installment; max `12` |
 | `capture` | boolean | Yes | `true` sale, `false` authorization only |
 | `card.holderName` | string | Yes | Card holder name |
 | `card.pan` | string | Yes | Card number |
@@ -92,12 +92,12 @@ Bu endpoint test kartı numarasına göre deterministik response döner.
 | `transactionId` | must not be blank |
 | `amount` | must be positive |
 | `currency` | must not be blank |
-| `installmentCount` | must be `>= 1` |
+| `installmentCount` | must be between `1` and `12` |
 | `capture` | must not be null |
 | `card.holderName` | must not be blank |
 | `card.pan` | must not be blank |
 | `card.expiryMonth` | must be between `01` and `12` |
-| `card.expiryYear` | must not be blank |
+| `card.expiryYear` | must be a 4-digit year |
 | `card.cvv` | must be 3 or 4 digits |
 
 ---
@@ -127,7 +127,13 @@ Response:
   "amount": "1250.50",
   "currency": "TRY",
   "installmentCount": 1,
-  "authorizedAt": "2026-05-04T19:30:00Z"
+  "installmentAmount": null,
+  "authorizedAt": "2026-05-04T19:30:00Z",
+  "threeDsSessionId": null,
+  "acsUrl": null,
+  "threeDsFlow": null,
+  "messageVersion": null,
+  "expiresAt": null
 }
 ```
 
@@ -173,7 +179,13 @@ Response:
   "amount": "1250.50",
   "currency": "TRY",
   "installmentCount": 1,
-  "authorizedAt": "2026-05-04T19:30:00Z"
+  "installmentAmount": null,
+  "authorizedAt": "2026-05-04T19:30:00Z",
+  "threeDsSessionId": null,
+  "acsUrl": null,
+  "threeDsFlow": null,
+  "messageVersion": null,
+  "expiresAt": null
 }
 ```
 
@@ -224,7 +236,13 @@ Example for insufficient funds:
   "amount": "1250.50",
   "currency": "TRY",
   "installmentCount": 1,
-  "authorizedAt": "2026-05-04T19:30:00Z"
+  "installmentAmount": null,
+  "authorizedAt": "2026-05-04T19:30:00Z",
+  "threeDsSessionId": null,
+  "acsUrl": null,
+  "threeDsFlow": null,
+  "messageVersion": null,
+  "expiresAt": null
 }
 ```
 
@@ -248,13 +266,55 @@ Example for system malfunction:
   "amount": "1250.50",
   "currency": "TRY",
   "installmentCount": 1,
-  "authorizedAt": "2026-05-04T19:30:00Z"
+  "installmentAmount": null,
+  "authorizedAt": "2026-05-04T19:30:00Z",
+  "threeDsSessionId": null,
+  "acsUrl": null,
+  "threeDsFlow": null,
+  "messageVersion": null,
+  "expiresAt": null
 }
 ```
 
 ---
 
-## 11. Validation Error Response
+## 11. Response Body - Pending 3DS
+
+When the card PAN is in the 3DS catalog:
+
+```json
+{
+  "status": "PENDING_3DS",
+  "transactionType": "AUTHORIZATION_ONLY",
+  "approved": false,
+  "responseCode": "PENDING",
+  "responseMessage": "3DS authentication required",
+  "transactionId": "attempt_3ds_001",
+  "posTransactionId": null,
+  "authCode": null,
+  "hostReferenceNumber": null,
+  "amount": "1250.50",
+  "currency": "TRY",
+  "installmentCount": 1,
+  "installmentAmount": null,
+  "authorizedAt": null,
+  "threeDsSessionId": "3ds_9f2c4e7b1a",
+  "acsUrl": "http://localhost:5102/mock-acs?sessionId=3ds_9f2c4e7b1a",
+  "threeDsFlow": "CHALLENGE",
+  "messageVersion": "2.2.0",
+  "expiresAt": "2026-05-13T09:15:00Z"
+}
+```
+
+Complete this flow through:
+
+```http
+POST /api/v1/pos/3ds/complete
+```
+
+---
+
+## 12. Validation Error Response
 
 HTTP status:
 
@@ -281,11 +341,11 @@ Response:
 
 ---
 
-## 12. Response Fields
+## 13. Response Fields
 
 | Field | Type | Nullable | Description |
 |---|---|---:|---|
-| `status` | string | No | `APPROVED`, `AUTHORIZED`, `DECLINED`, `FAILED` |
+| `status` | string | No | `APPROVED`, `AUTHORIZED`, `PENDING_3DS`, `DECLINED`, `FAILED` |
 | `transactionType` | string | No | `SALE` or `AUTHORIZATION_ONLY` |
 | `approved` | boolean | No | Whether POS approved the payment |
 | `responseCode` | string | No | POS response code |
@@ -297,11 +357,17 @@ Response:
 | `amount` | string decimal | No | Echoed amount |
 | `currency` | string | No | Echoed currency |
 | `installmentCount` | integer | No | Echoed installment count |
-| `authorizedAt` | string datetime | No | POS response timestamp |
+| `installmentAmount` | string decimal | Yes | Per-installment amount for approved installment payments |
+| `authorizedAt` | string datetime | Yes | POS response timestamp; null while 3DS is pending |
+| `threeDsSessionId` | string | Yes | 3DS session id when authentication is required |
+| `acsUrl` | string | Yes | Mock ACS URL when authentication is required |
+| `threeDsFlow` | string | Yes | `FRICTIONLESS`, `CHALLENGE`, `ATTEMPTED`, or `TIMEOUT` |
+| `messageVersion` | string | Yes | 3DS message version |
+| `expiresAt` | string datetime | Yes | 3DS session expiry |
 
 ---
 
-## 13. POS Response Codes
+## 14. POS Response Codes
 
 | Code | Message | Status |
 |---|---|---|
@@ -318,9 +384,11 @@ Response:
 | `57` | Transaction not permitted to cardholder | `DECLINED` |
 | `58` | Transaction not permitted to terminal | `FAILED` |
 | `61` | Exceeds amount limit | `DECLINED` |
+| `62` | Restricted card | `DECLINED` |
 | `65` | Exceeds frequency limit | `DECLINED` |
 | `91` | Issuer or switch unavailable | `FAILED` |
 | `96` | System malfunction | `FAILED` |
+| `PENDING` | 3DS authentication required | `PENDING_3DS` |
 | `TIMEOUT` | Bank POS timeout | `FAILED` |
 
 For `00`:

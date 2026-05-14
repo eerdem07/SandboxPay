@@ -143,7 +143,7 @@ Response:
   "hostReferenceNumber": "HST20260513084500B8L4",
   "amount": "1250.50",
   "currency": "TRY",
-  "voidedAt": "2026-05-13T08:45:00Z"
+  "voidedAt": null
 }
 ```
 
@@ -173,7 +173,7 @@ When the referenced authorization cannot be found, is not authorization-only, is
   "hostReferenceNumber": null,
   "amount": "1250.50",
   "currency": "TRY",
-  "voidedAt": "2026-05-13T08:45:00Z"
+  "voidedAt": null
 }
 ```
 
@@ -197,7 +197,7 @@ When the void amount or currency does not match the original authorization:
   "hostReferenceNumber": null,
   "amount": "1000.00",
   "currency": "TRY",
-  "voidedAt": "2026-05-13T08:45:00Z"
+  "voidedAt": null
 }
 ```
 
@@ -221,7 +221,7 @@ When the original authorization was already voided:
   "hostReferenceNumber": null,
   "amount": "1250.50",
   "currency": "TRY",
-  "voidedAt": "2026-05-13T08:46:00Z"
+  "voidedAt": null
 }
 ```
 
@@ -249,11 +249,11 @@ When the original authorization was already captured:
   "hostReferenceNumber": null,
   "amount": "1250.50",
   "currency": "TRY",
-  "voidedAt": "2026-05-13T08:47:00Z"
+  "voidedAt": null
 }
 ```
 
-Captured authorizations should be handled by refund in a future use case.
+Captured authorizations should be handled by refund.
 
 ---
 
@@ -300,7 +300,7 @@ Response:
 | `hostReferenceNumber` | string | Yes | Void host reference number |
 | `amount` | string decimal | No | Echoed void amount |
 | `currency` | string | No | Echoed currency |
-| `voidedAt` | string datetime | No | POS void response timestamp |
+| `voidedAt` | string datetime | Yes | POS void response timestamp; null on failure |
 
 ---
 

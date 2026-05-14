@@ -1,4 +1,4 @@
-using System.Globalization;
+using Microsoft.Extensions.Options;
 using SandboxPay.Api.Modules.MockPos.Domain;
 using SandboxPay.Api.Modules.MockPos.Support;
 
@@ -11,19 +11,34 @@ public interface IAuthorizePaymentService
 
 public sealed class AuthorizePaymentService(
     IPosIdGenerator posIdGenerator,
-    IPosAuthorizationStore authorizationStore) : IAuthorizePaymentService
+    IPosAuthorizationStore authorizationStore,
+    IPos3DsSessionStore pos3DsSessionStore,
+    IOptions<MockPosOptions> options) : IAuthorizePaymentService
 {
-    private static readonly TimeSpan AuthorizationTtl = TimeSpan.FromDays(7);
+    private readonly string acsBaseUrl = options.Value.AcsBaseUrl;
 
     public AuthorizePaymentResult Authorize(AuthorizePaymentCommand command)
     {
         var normalizedPan = CardNumber.Normalize(command.CardPan);
 
-        if (!TestCardCatalog.TryResolveResponseCode(normalizedPan, out var responseCode))
+        if (ThreeDsCardCatalog.TryGet(normalizedPan, out var threeDsFlow, out var threeDsScenario))
         {
-            responseCode = LuhnValidator.IsValid(normalizedPan)
-                ? PosResponseCode.Approved
-                : PosResponseCode.InvalidCardNumber;
+            return Initiate3Ds(command, threeDsFlow, threeDsScenario);
+        }
+
+        PosResponseCode responseCode;
+        if (command.InstallmentCount >= 2
+            && InstallmentCardCatalog.TryResolve(normalizedPan, command.InstallmentCount, out var installmentDeclined))
+        {
+            responseCode = installmentDeclined!;
+        }
+        else if (TestCardCatalog.TryResolveResponseCode(normalizedPan, out var catalogCode))
+        {
+            responseCode = catalogCode!;
+        }
+        else
+        {
+            responseCode = LuhnValidator.IsValid(normalizedPan) ? PosResponseCode.Approved : PosResponseCode.InvalidCardNumber;
         }
 
         var transactionType = command.Capture
@@ -33,6 +48,9 @@ public sealed class AuthorizePaymentService(
         var approved = responseCode.IsApproval;
         var authorizedAt = DateTimeOffset.UtcNow;
         var hasHostIdentifiers = status != PosAuthorizeStatus.FAILED;
+        var installmentAmount = approved
+            ? PosConstants.CalculateInstallmentAmount(command.Amount, command.InstallmentCount)
+            : null;
 
         var result = new AuthorizePaymentResult(
             status,
@@ -47,7 +65,8 @@ public sealed class AuthorizePaymentService(
             command.Amount,
             command.Currency,
             command.InstallmentCount,
-            authorizedAt.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture));
+            installmentAmount,
+            PosConstants.FormatTimestamp(authorizedAt));
 
         if (ShouldStoreAuthorization(result))
         {
@@ -61,14 +80,63 @@ public sealed class AuthorizePaymentService(
                 result.HostReferenceNumber!,
                 command.Amount,
                 command.Currency,
+                command.InstallmentCount,
                 authorizedAt,
-                authorizedAt.Add(AuthorizationTtl),
+                authorizedAt.Add(PosConstants.AuthorizationTtl),
                 Captured: result.TransactionType == PosTransactionType.SALE,
                 Voided: false,
                 Refunded: false));
         }
 
         return result;
+    }
+
+    private AuthorizePaymentResult Initiate3Ds(
+        AuthorizePaymentCommand command,
+        ThreeDsFlow flow,
+        ThreeDsScenario scenario)
+    {
+        var initiatedAt = DateTimeOffset.UtcNow;
+        var expiresAt = initiatedAt.AddMinutes(15);
+        var sessionId = posIdGenerator.Generate3DsSessionId();
+        var transactionType = command.Capture ? PosTransactionType.SALE : PosTransactionType.AUTHORIZATION_ONLY;
+
+        pos3DsSessionStore.Save(new Pos3DsSession(
+            sessionId,
+            command.MerchantId,
+            command.TerminalId,
+            command.OrderId,
+            command.TransactionId,
+            command.Amount,
+            command.Currency,
+            command.InstallmentCount,
+            command.Capture,
+            flow,
+            scenario,
+            initiatedAt,
+            expiresAt,
+            Completed: false));
+
+        return new AuthorizePaymentResult(
+            PosAuthorizeStatus.PENDING_3DS,
+            transactionType,
+            Approved: false,
+            PosResponseCode.Pending.Code,
+            PosResponseCode.Pending.Message,
+            command.TransactionId,
+            PosTransactionId: null,
+            AuthCode: null,
+            HostReferenceNumber: null,
+            command.Amount,
+            command.Currency,
+            command.InstallmentCount,
+            InstallmentAmount: null,
+            AuthorizedAt: null,
+            ThreeDsSessionId: sessionId,
+            AcsUrl: $"{acsBaseUrl}?sessionId={sessionId}",
+            ThreeDsFlow: flow,
+            MessageVersion: PosConstants.ThreeDsMessageVersion,
+            ExpiresAt: PosConstants.FormatTimestamp(expiresAt));
     }
 
     private static bool ShouldStoreAuthorization(AuthorizePaymentResult result)

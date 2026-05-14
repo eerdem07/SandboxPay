@@ -17,7 +17,7 @@ public sealed class VoidPaymentService(
     {
         var voidedAt = DateTimeOffset.UtcNow;
 
-        if (!authorizationStore.TryGet(command.OriginalTransactionId, out var authorization))
+        if (!authorizationStore.TryGet(command.OriginalTransactionId, out var authorization) || authorization is null)
         {
             return Failure(command, PosResponseCode.InvalidTransaction, voidedAt);
         }
@@ -59,7 +59,7 @@ public sealed class VoidPaymentService(
             hostReferenceNumber,
             command.Amount,
             command.Currency,
-            FormatTimestamp(voidedAt));
+            PosConstants.FormatTimestamp(voidedAt));
     }
 
     private static VoidPaymentResult Failure(
@@ -80,7 +80,7 @@ public sealed class VoidPaymentService(
             HostReferenceNumber: null,
             command.Amount,
             command.Currency,
-            FormatTimestamp(voidedAt));
+            VoidedAt: null);
     }
 
     private static bool MatchesIdentifiers(VoidPaymentCommand command, PosAuthorization authorization)
@@ -113,10 +113,5 @@ public sealed class VoidPaymentService(
                 CultureInfo.InvariantCulture,
                 out var authorized)
             && requested == authorized;
-    }
-
-    private static string FormatTimestamp(DateTimeOffset timestamp)
-    {
-        return timestamp.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
     }
 }

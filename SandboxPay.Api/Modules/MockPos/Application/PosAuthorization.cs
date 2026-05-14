@@ -10,6 +10,7 @@ public sealed record PosAuthorization(
     string HostReferenceNumber,
     string Amount,
     string Currency,
+    int InstallmentCount,
     DateTimeOffset AuthorizedAt,
     DateTimeOffset AuthorizationExpiresAt,
     bool Captured,

@@ -1,0 +1,11 @@
+namespace SandboxPay.Api.Modules.MockPos.Domain;
+
+public enum ThreeDsScenario
+{
+    FRICTIONLESS_APPROVED,
+    CHALLENGE_APPROVED,
+    CHALLENGE_FAILED_AUTH,
+    UNAVAILABLE_ATTEMPTED,
+    CHALLENGE_TIMEOUT,
+    FRICTIONLESS_DECLINED
+}

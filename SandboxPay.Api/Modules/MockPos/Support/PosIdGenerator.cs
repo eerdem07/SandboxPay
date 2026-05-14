@@ -15,6 +15,8 @@ public interface IPosIdGenerator
 
     string GeneratePosRefundId();
 
+    string Generate3DsSessionId();
+
     string GenerateHostReferenceNumber(DateTimeOffset timestamp);
 }
 
@@ -45,6 +47,11 @@ public sealed class PosIdGenerator : IPosIdGenerator
     public string GeneratePosRefundId()
     {
         return $"pos_ref_{Convert.ToHexString(RandomNumberGenerator.GetBytes(5)).ToLowerInvariant()}";
+    }
+
+    public string Generate3DsSessionId()
+    {
+        return $"3ds_{Convert.ToHexString(RandomNumberGenerator.GetBytes(5)).ToLowerInvariant()}";
     }
 
     public string GenerateHostReferenceNumber(DateTimeOffset timestamp)

@@ -17,7 +17,7 @@ public sealed class CapturePaymentService(
     {
         var capturedAt = DateTimeOffset.UtcNow;
 
-        if (!authorizationStore.TryGet(command.OriginalTransactionId, out var authorization))
+        if (!authorizationStore.TryGet(command.OriginalTransactionId, out var authorization) || authorization is null)
         {
             return Failure(command, PosResponseCode.InvalidTransaction, capturedAt);
         }
@@ -59,7 +59,7 @@ public sealed class CapturePaymentService(
             hostReferenceNumber,
             command.Amount,
             command.Currency,
-            FormatTimestamp(capturedAt));
+            PosConstants.FormatTimestamp(capturedAt));
     }
 
     private static CapturePaymentResult Failure(
@@ -80,7 +80,7 @@ public sealed class CapturePaymentService(
             HostReferenceNumber: null,
             command.Amount,
             command.Currency,
-            FormatTimestamp(capturedAt));
+            CapturedAt: null);
     }
 
     private static bool MatchesIdentifiers(CapturePaymentCommand command, PosAuthorization authorization)
@@ -113,10 +113,5 @@ public sealed class CapturePaymentService(
                 CultureInfo.InvariantCulture,
                 out var authorized)
             && requested == authorized;
-    }
-
-    private static string FormatTimestamp(DateTimeOffset timestamp)
-    {
-        return timestamp.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
     }
 }

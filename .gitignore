@@ -51,3 +51,7 @@ httpRequests/
 *.log
 *.tmp
 *.temp
+
+# Local notes
+SandboxPay.Api/docs/gemini.md
+SandboxPay.Api/docs/backlog.md

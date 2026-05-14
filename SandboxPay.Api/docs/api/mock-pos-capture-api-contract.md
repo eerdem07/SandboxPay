@@ -137,7 +137,7 @@ Response:
   "hostReferenceNumber": "HST20260513083000A7K2",
   "amount": "1250.50",
   "currency": "TRY",
-  "capturedAt": "2026-05-13T08:30:00Z"
+  "capturedAt": null
 }
 ```
 
@@ -167,7 +167,7 @@ When the referenced authorization cannot be found, is not authorization-only, or
   "hostReferenceNumber": null,
   "amount": "1250.50",
   "currency": "TRY",
-  "capturedAt": "2026-05-13T08:30:00Z"
+  "capturedAt": null
 }
 ```
 
@@ -193,7 +193,7 @@ When the capture amount or currency does not match the original authorization:
   "hostReferenceNumber": null,
   "amount": "1000.00",
   "currency": "TRY",
-  "capturedAt": "2026-05-13T08:30:00Z"
+  "capturedAt": null
 }
 ```
 
@@ -217,7 +217,7 @@ When the original authorization was already captured:
   "hostReferenceNumber": null,
   "amount": "1250.50",
   "currency": "TRY",
-  "capturedAt": "2026-05-13T08:31:00Z"
+  "capturedAt": null
 }
 ```
 
@@ -266,7 +266,7 @@ Response:
 | `hostReferenceNumber` | string | Yes | Capture host reference number |
 | `amount` | string decimal | No | Echoed capture amount |
 | `currency` | string | No | Echoed currency |
-| `capturedAt` | string datetime | No | POS capture response timestamp |
+| `capturedAt` | string datetime | Yes | POS capture response timestamp; null on failure |
 
 ---
 

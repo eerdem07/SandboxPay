@@ -16,9 +16,13 @@ public sealed record PosResponseCode(string Code, string Message, PosAuthorizeSt
     public static readonly PosResponseCode TransactionNotPermittedToTerminal = new("58", "Transaction not permitted to terminal", PosAuthorizeStatus.FAILED);
     public static readonly PosResponseCode ExceedsAmountLimit = new("61", "Exceeds amount limit", PosAuthorizeStatus.DECLINED);
     public static readonly PosResponseCode ExceedsFrequencyLimit = new("65", "Exceeds frequency limit", PosAuthorizeStatus.DECLINED);
+    public static readonly PosResponseCode RestrictedCard = new("62", "Restricted card", PosAuthorizeStatus.DECLINED);
     public static readonly PosResponseCode IssuerUnavailable = new("91", "Issuer or switch unavailable", PosAuthorizeStatus.FAILED);
     public static readonly PosResponseCode SystemMalfunction = new("96", "System malfunction", PosAuthorizeStatus.FAILED);
     public static readonly PosResponseCode Timeout = new("TIMEOUT", "Bank POS timeout", PosAuthorizeStatus.FAILED);
+    public static readonly PosResponseCode Pending = new("PENDING", "3DS authentication required", PosAuthorizeStatus.PENDING_3DS);
+    public static readonly PosResponseCode ThreeDsAuthFailed = new("3DS_AUTH_FAILED", "3DS authentication failed", PosAuthorizeStatus.DECLINED);
+    public static readonly PosResponseCode ThreeDsTimeout = new("3DS_TIMEOUT", "3DS session expired", PosAuthorizeStatus.FAILED);
 
     private static readonly IReadOnlyDictionary<string, PosResponseCode> Codes =
         new Dictionary<string, PosResponseCode>(StringComparer.Ordinal)
@@ -37,9 +41,13 @@ public sealed record PosResponseCode(string Code, string Message, PosAuthorizeSt
             [TransactionNotPermittedToTerminal.Code] = TransactionNotPermittedToTerminal,
             [ExceedsAmountLimit.Code] = ExceedsAmountLimit,
             [ExceedsFrequencyLimit.Code] = ExceedsFrequencyLimit,
+            [RestrictedCard.Code] = RestrictedCard,
             [IssuerUnavailable.Code] = IssuerUnavailable,
             [SystemMalfunction.Code] = SystemMalfunction,
-            [Timeout.Code] = Timeout
+            [Timeout.Code] = Timeout,
+            [Pending.Code] = Pending,
+            [ThreeDsAuthFailed.Code] = ThreeDsAuthFailed,
+            [ThreeDsTimeout.Code] = ThreeDsTimeout
         };
 
     public bool IsApproval => Code == Approved.Code;

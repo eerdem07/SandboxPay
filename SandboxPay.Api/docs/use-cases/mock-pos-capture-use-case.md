@@ -2,8 +2,8 @@
 
 Status: Draft  
 Module: mock-pos  
-Related API contract: `mock-pos-capture-api-contract.md`  
-Related authorize use case: `mock-pos-authorize-use-case.md`
+Related API contract: [`../api/mock-pos-capture-api-contract.md`](../api/mock-pos-capture-api-contract.md)
+Related authorize use case: [`mock-pos-authorize-use-case.md`](mock-pos-authorize-use-case.md)
 
 ---
 
@@ -53,11 +53,7 @@ Mira Gateway Backend <-> Mock BankPOS
 POST /api/v1/pos/capture
 ```
 
-Endpoint detayları için:
-
-```text
-mock-pos-capture-api-contract.md
-```
+Endpoint detayları için [`../api/mock-pos-capture-api-contract.md`](../api/mock-pos-capture-api-contract.md) dosyasına bakınız.
 
 Reason:
 

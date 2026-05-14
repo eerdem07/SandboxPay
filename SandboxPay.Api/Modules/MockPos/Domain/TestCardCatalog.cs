@@ -21,10 +21,12 @@ public static class TestCardCatalog
             ["4000000000000065"] = "65",
             ["4000000000000091"] = "91",
             ["4000000000000096"] = "96",
+            ["4000000000006000"] = "00",
+            ["4000000000006003"] = "00",
             ["4000000000009995"] = "TIMEOUT"
         };
 
-    public static bool TryResolveResponseCode(string normalizedPan, out PosResponseCode responseCode)
+    public static bool TryResolveResponseCode(string normalizedPan, out PosResponseCode? responseCode)
     {
         if (Cards.TryGetValue(normalizedPan, out var code))
         {
@@ -32,7 +34,7 @@ public static class TestCardCatalog
             return true;
         }
 
-        responseCode = PosResponseCode.InvalidCardNumber;
+        responseCode = null;
         return false;
     }
 }

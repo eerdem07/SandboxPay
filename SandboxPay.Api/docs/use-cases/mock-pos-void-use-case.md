@@ -2,9 +2,9 @@
 
 Status: Draft  
 Module: mock-pos  
-Related API contract: `mock-pos-void-api-contract.md`  
-Related authorize use case: `mock-pos-authorize-use-case.md`  
-Related capture use case: `mock-pos-capture-use-case.md`
+Related API contract: [`../api/mock-pos-void-api-contract.md`](../api/mock-pos-void-api-contract.md)
+Related authorize use case: [`mock-pos-authorize-use-case.md`](mock-pos-authorize-use-case.md)
+Related capture use case: [`mock-pos-capture-use-case.md`](mock-pos-capture-use-case.md)
 
 ---
 
@@ -34,7 +34,7 @@ Kapsam disi:
 
 Not:
 
-- `capture=true` sale islemleri ve `captured=true` authorization islemleri ileride refund use case kapsaminda ele alinmalidir.
+- `capture=true` sale islemleri ve `captured=true` authorization islemleri refund use case kapsamindadir.
 
 ---
 
@@ -58,11 +58,7 @@ Mira Gateway Backend <-> Mock BankPOS
 POST /api/v1/pos/void
 ```
 
-Endpoint detaylari icin:
-
-```text
-mock-pos-void-api-contract.md
-```
+Endpoint detaylari icin [`../api/mock-pos-void-api-contract.md`](../api/mock-pos-void-api-contract.md) dosyasina bakiniz.
 
 Reason:
 

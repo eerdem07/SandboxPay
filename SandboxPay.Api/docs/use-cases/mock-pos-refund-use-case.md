@@ -2,10 +2,10 @@
 
 Status: Draft  
 Module: mock-pos  
-Related API contract: `mock-pos-refund-api-contract.md`  
-Related authorize use case: `mock-pos-authorize-use-case.md`  
-Related capture use case: `mock-pos-capture-use-case.md`  
-Related void use case: `mock-pos-void-use-case.md`
+Related API contract: [`../api/mock-pos-refund-api-contract.md`](../api/mock-pos-refund-api-contract.md)
+Related authorize use case: [`mock-pos-authorize-use-case.md`](mock-pos-authorize-use-case.md)
+Related capture use case: [`mock-pos-capture-use-case.md`](mock-pos-capture-use-case.md)
+Related void use case: [`mock-pos-void-use-case.md`](mock-pos-void-use-case.md)
 
 ---
 
@@ -61,11 +61,7 @@ Mira Gateway Backend <-> Mock BankPOS
 POST /api/v1/pos/refund
 ```
 
-Endpoint detayları için:
-
-```text
-mock-pos-refund-api-contract.md
-```
+Endpoint detayları için [`../api/mock-pos-refund-api-contract.md`](../api/mock-pos-refund-api-contract.md) dosyasına bakınız.
 
 ---
 

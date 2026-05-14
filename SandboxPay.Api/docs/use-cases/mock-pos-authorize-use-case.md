@@ -2,8 +2,8 @@
 
 Status: Draft  
 Module: mock-pos  
-Related API contract: `mock-pos-authorize-api-contract.md`  
-Related capture use case: `mock-pos-capture-use-case.md`
+Related API contract: [`../api/mock-pos-authorize-api-contract.md`](../api/mock-pos-authorize-api-contract.md)
+Related capture use case: [`mock-pos-capture-use-case.md`](mock-pos-capture-use-case.md)
 
 ---
 
@@ -13,14 +13,8 @@ Related capture use case: `mock-pos-capture-use-case.md`
 
 Bu use case gerçek banka POS entegrasyonunu simüle eder.
 
-Şimdilik kapsam:
-
-- 3D Secure yok
-- Refund yok
-- Void yok
-- Settlement yok
-- Payout yok
-- Database persistence yok
+Bu use case authorize kararını ve başarılı authorization metadata'sının in-memory store'a yazılmasını kapsar.
+Capture, void, refund, 3DS ve installment detayları kendi use case dokümanlarında ele alınır.
 
 Tek sorumluluk:
 
@@ -57,11 +51,7 @@ Mira Gateway Backend <-> Mock BankPOS
 POST /api/v1/pos/authorize
 ```
 
-Endpoint detayları için:
-
-```text
-mock-pos-authorize-api-contract.md
-```
+Endpoint detayları için [`../api/mock-pos-authorize-api-contract.md`](../api/mock-pos-authorize-api-contract.md) dosyasına bakınız.
 
 ---
 
@@ -75,12 +65,12 @@ Request geçerli olmalıdır:
 - `transactionId` zorunlu
 - `amount` zorunlu ve pozitif olmalı
 - `currency` zorunlu
-- `installmentCount` en az `1` olmalı
+- `installmentCount` `1` ile `12` arasında olmalı
 - `capture` zorunlu
 - `card.holderName` zorunlu
 - `card.pan` zorunlu
 - `card.expiryMonth` zorunlu
-- `card.expiryYear` zorunlu
+- `card.expiryYear` 4 haneli yıl olmalı
 - `card.cvv` zorunlu
 
 ---

@@ -15,7 +15,7 @@ public sealed record CapturePaymentResponse(
     string? HostReferenceNumber,
     string Amount,
     string Currency,
-    string CapturedAt)
+    string? CapturedAt)
 {
     public static CapturePaymentResponse FromResult(CapturePaymentResult result)
     {

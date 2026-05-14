@@ -2,23 +2,23 @@ using SandboxPay.Api.Modules.MockPos.Domain;
 
 namespace SandboxPay.Api.Modules.MockPos.Application;
 
-public sealed record AuthorizePaymentResult(
+public sealed record Complete3DsResult(
     PosAuthorizeStatus Status,
     PosTransactionType TransactionType,
     bool Approved,
     string ResponseCode,
     string ResponseMessage,
     string TransactionId,
+    string? OriginalTransactionId,
     string? PosTransactionId,
     string? AuthCode,
     string? HostReferenceNumber,
-    string Amount,
-    string Currency,
-    int InstallmentCount,
+    string? Amount,
+    string? Currency,
+    int? InstallmentCount,
     string? InstallmentAmount,
-    string? AuthorizedAt,
-    string? ThreeDsSessionId = null,
-    string? AcsUrl = null,
-    ThreeDsFlow? ThreeDsFlow = null,
-    string? MessageVersion = null,
-    string? ExpiresAt = null);
+    string AuthorizedAt,
+    string ThreeDsSessionId,
+    ThreeDsStatus? ThreeDsStatus,
+    string? Eci,
+    string? MessageVersion);
